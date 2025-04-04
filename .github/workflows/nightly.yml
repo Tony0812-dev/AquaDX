@@ -1,10 +1,6 @@
-# Build script credit to https://github.com/OpenIntelWireless/itlwm/blob/master/.github/workflows/main.yml
 name: Nightly Build
 
 on:
-  push:
-    branches: [master]
-    paths: ['src/**']
   workflow_dispatch:
 
 jobs:
@@ -28,24 +24,7 @@ jobs:
 
       - name: Build Artifact
         run: bash ./tools/build.sh
-
-      - name: Delete previous nightly release
-        run: |
-          gh release delete --cleanup-tag --yes --repo $GITHUB_REPOSITORY nightly || true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Publish GitHub Release
-        uses: ncipollo/release-action@v1
+      
+      - uses: actions/upload-artifact@v4
         with:
-          bodyFile: "build/release/ReleaseNotes.md"
-          artifacts: "build/libs/aqua-nightly.jar,build/aqua-nightly.zip"
-          tag: "nightly"
-          token: ${{ secrets.GITHUB_TOKEN }}
-          draft: false
-
-      - name: Mark release undraft
-        run: |
-          gh release edit nightly --draft=false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          path: ./
